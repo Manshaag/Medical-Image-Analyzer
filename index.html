@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A local image-processing workspace for exploring grayscale images, regions, histograms and contrast.">
+  <title>Medical Image Analyzer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="analysis.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="identity"><span class="brandmark" aria-hidden="true">▥</span><div><h1>Medical Image Analyzer</h1><p>Image exploration workspace</p></div></div>
+    <span class="privacy"><span aria-hidden="true">●</span> Images stay in this browser</span>
+  </header>
+  <main>
+    <aside class="controls" aria-label="Analysis controls">
+      <section>
+        <h2>Source image</h2>
+        <label class="file-label" for="file">Open an image</label>
+        <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp">
+        <p class="help">PNG, JPEG, WebP or BMP · up to 12 MB</p>
+        <button id="demo" class="secondary">Load synthetic sample</button>
+        <p id="source" class="source">Synthetic phantom · 512 × 512</p>
+      </section>
+      <section>
+        <h2>Processing</h2>
+        <label for="mode">Display mode</label>
+        <select id="mode"><option value="window">Contrast window</option><option value="edges">Sobel edges</option><option value="mask">Threshold mask</option></select>
+        <div class="field"><label for="center">Window center</label><output id="center-value" for="center">128</output></div>
+        <input id="center" type="range" min="0" max="255" value="128">
+        <div class="field"><label for="width">Window width</label><output id="width-value" for="width">256</output></div>
+        <input id="width" type="range" min="1" max="512" value="256">
+        <label class="check"><input id="invert" type="checkbox"> Invert contrast view</label>
+        <div class="field"><label for="threshold">Intensity threshold</label><output id="threshold-value" for="threshold">128</output></div>
+        <input id="threshold" type="range" min="0" max="255" value="128">
+        <p class="help">Edges and masks use original grayscale intensities. Window controls affect the contrast view.</p>
+        <button id="reset" class="text-button">Reset processing</button>
+      </section>
+      <section>
+        <h2>Region of interest</h2>
+        <p class="help">Drag on the processed image, or enter a rectangle in pixels.</p>
+        <div class="region-fields">
+          <label for="roi-x">X<input id="roi-x" type="number" min="0" value="0"></label>
+          <label for="roi-y">Y<input id="roi-y" type="number" min="0" value="0"></label>
+          <label for="roi-w">Width<input id="roi-w" type="number" min="1" value="512"></label>
+          <label for="roi-h">Height<input id="roi-h" type="number" min="1" value="512"></label>
+        </div>
+        <button id="apply-roi" class="secondary">Measure region</button>
+        <button id="clear-roi" class="text-button">Use whole image</button>
+      </section>
+    </aside>
+    <div class="workspace">
+      <div class="workspace-heading"><div><h2>Inspect the image. Measure a region.</h2><p>Compare processing against the original and export a reproducible record.</p></div><button id="report">Export JSON report</button></div>
+      <p id="status" class="status" role="status">Synthetic sample loaded. Select a region to explore its intensity distribution.</p>
+      <div class="viewers">
+        <figure><figcaption><strong>Original grayscale</strong><span id="resolution">512 × 512 px</span></figcaption><div class="canvas-well"><canvas id="original" width="512" height="512" aria-label="Original grayscale image"></canvas></div><p class="viewer-note">Unmodified intensities · 8-bit display values</p></figure>
+        <figure><figcaption><strong id="mode-title">Contrast window</strong><span class="region-key">Selected region</span></figcaption><div class="canvas-well"><canvas id="processed" width="512" height="512" aria-label="Processed image; drag to select a region"></canvas></div><div class="viewer-actions"><p class="viewer-note">Drag to measure</p><button id="save-image" class="text-button">Save processed PNG</button></div></figure>
+      </div>
+      <section class="measurements" aria-labelledby="measure-title">
+        <div class="measurement-title"><h2 id="measure-title">Region measurements</h2><span id="region-description">Whole image</span></div>
+        <div class="metric-grid">
+          <div><span>Mean intensity</span><strong id="mean">—</strong><small>0–255 grayscale</small></div>
+          <div><span>Standard deviation</span><strong id="std">—</strong><small>Intensity spread</small></div>
+          <div><span>Above threshold</span><strong id="above">—</strong><small id="threshold-note">Intensity ≥ 128</small></div>
+          <div><span>Selected pixels</span><strong id="count">—</strong><small id="range">Range —</small></div>
+        </div>
+        <div class="histogram-head"><h3>Intensity distribution</h3><span id="entropy">Entropy — bits</span></div>
+        <canvas id="histogram" width="1024" height="160" role="img" aria-label="Histogram of original grayscale values in the selected region"></canvas>
+        <div class="axis"><span>0 · dark</span><span>128</span><span>255 · bright</span></div>
+      </section>
+      <footer><strong>Educational image processing.</strong> No disease detection or clinical validation. DICOM, Hounsfield units and calibrated physical measurements are not supported. The built-in phantom is synthetic.</footer>
+    </div>
+  </main>
+</body>
+</html>
